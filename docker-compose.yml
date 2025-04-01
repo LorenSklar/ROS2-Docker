@@ -1,13 +1,15 @@
-version: '3'
 services:
   ros2_dev:
     build: .
     container_name: ros2_docker
     volumes:
       - ./workspace:/root/ros2_ws
+    ports:
+      - "6080:6080"  # included for noVNC web interface
     environment:
-      - DISPLAY=${DISPLAY}
-    network_mode: host
-    command: /bin/bash
+      - VNC_PASSWORD=${VNC_PASSWORD:-password}  
+    command: /usr/local/bin/start.sh /bin/bash
     stdin_open: true
     tty: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

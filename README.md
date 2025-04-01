@@ -35,7 +35,7 @@ ros2_docker_dev/
     └── src/          # Source code directory
 ```
 
-## Setup Instructions
+## Basic Setup
 
 1. Clone this repository:
 ```bash
@@ -58,7 +58,7 @@ docker-compose up -d
 docker exec -it ros2_docker bash
 ```
 
-## Testing the Setup
+## Testing Basic Setup
 
 Inside the container, you can test ROS2 with the demo nodes:
 
@@ -75,6 +75,50 @@ ros2 run demo_nodes_py listener
 
 You should see messages being published and received between the nodes.
 
+## GUI Support (Optional)
+
+### Understanding GUI Support in Docker
+Docker containers are isolated environments that don't have direct access to your system's display. To run GUI applications (like RViz2) from within a container, we use a web-based VNC solution (noVNC) that provides a virtual display and allows you to access it through your web browser.
+
+This approach:
+- Works reliably on all platforms, including Apple Silicon Macs
+- Doesn't require XQuartz or other X11 forwarding setup
+- Provides a secure, web-based interface to the container's display
+
+### Setting Up GUI Support
+1. Rebuild the container with GUI support:
+   ```bash
+   docker-compose down
+   docker-compose build
+   docker-compose up -d
+   ```
+
+2. Access the web interface:
+   - Open http://localhost:6080/vnc.html in your web browser
+   - Enter the VNC password (default is "password" unless you set VNC_PASSWORD)
+   - Click "Connect"
+
+3. Test the setup:
+   ```bash
+   docker exec -it ros2_docker bash
+   rviz2
+   ```
+
+### Performance Considerations
+- The virtual display uses software rendering, which can be CPU-intensive
+- Default resolution is 1024x768 to balance performance and usability
+- If you experience high CPU usage:
+  - Close RViz2 when not in use
+  - Use a lower resolution by modifying the Xvfb command in start.sh
+  - Consider using headless mode for non-interactive tasks
+
+### Customizing the Setup
+You can customize the VNC password by setting the VNC_PASSWORD environment variable:
+```bash
+echo "VNC_PASSWORD=your_secure_password" > .env
+docker-compose up -d
+```
+
 ## Common Issues and Solutions
 
 1. **Docker Desktop not running**
@@ -88,6 +132,20 @@ You should see messages being published and received between the nodes.
 3. **Network issues**
    - Ensure Docker Desktop has network access
    - Check Docker Desktop settings → Resources → Network
+
+4. **GUI issues**
+   - If noVNC page doesn't load:
+     - Check if container is running: `docker ps`
+     - Verify port 6080 is accessible: `curl localhost:6080`
+     - Check container logs: `docker logs ros2_docker`
+   - If VNC connection fails:
+     - Verify VNC password is correct
+     - Check if port 5901 is accessible
+     - Try refreshing the browser page
+   - If RViz2 is slow or unresponsive:
+     - Reduce display resolution in start.sh
+     - Close other resource-intensive applications
+     - Consider using headless mode for non-interactive tasks
 
 ## Development Workflow
 

@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg2 \
     lsb-release \
+    iputils-ping \
+    net-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # Add ROS2 repository
@@ -25,7 +27,24 @@ RUN apt-get update && apt-get install -y \
     ros-humble-desktop \
     python3-pip \
     python3-colcon-common-extensions \
+    x11-apps \
+    xauth \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    mesa-utils \
+    xvfb \
+    x11vnc \
+    novnc \
+    supervisor \
+    tightvncserver \
     && rm -rf /var/lib/apt/lists/*
 
 # Source ROS2 setup in .bashrc
 RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc
+
+# Copy startup script
+COPY start.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/start.sh
+
+# Set display environment variable
+ENV DISPLAY=:1
