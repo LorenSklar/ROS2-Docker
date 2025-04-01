@@ -1,0 +1,13 @@
+version: '3'
+services:
+  ros2_dev:
+    build: .
+    container_name: ros2_docker
+    volumes:
+      - ./workspace:/root/ros2_ws
+    environment:
+      - DISPLAY=${DISPLAY}
+    network_mode: host
+    command: /bin/bash
+    stdin_open: true
+    tty: true
